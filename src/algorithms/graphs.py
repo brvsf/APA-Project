@@ -1,4 +1,4 @@
-graph1 = {
+GRAPH_SMALL = {
     'P': [('A', 2), ('B', 5)],
     'A': [('B', 2), ('C', 4)],
     'B': [('C', 1), ('Q', 7)],
@@ -6,7 +6,7 @@ graph1 = {
     'Q': []
 }
 
-graph2 = {
+GRAPH_MEDIUM = {
     'P': [('A', 4), ('B', 8)],
     'A': [('B', 2), ('C', 5)],
     'B': [('C', 1), ('D', 10)],
@@ -19,7 +19,7 @@ graph2 = {
     'Q': []
 }
 
-graph3 = {
+GRAPH_BIG = {
     'P': [('A', 2), ('B', 4), ('C', 7)],
     'A': [('D', 3), ('E', 6)],
     'B': [('E', 2), ('F', 5)],
@@ -35,4 +35,19 @@ graph3 = {
     'L': [('M', 2)],
     'M': [('Q', 4)],
     'Q': []
+}
+
+EXPECTED_GRAPH_SMALL = {
+    'expected_distance': 8,
+    'expected_path': ['P', 'A', 'B', 'C', 'Q'],
+}
+
+EXPECTED_GRAPH_MEDIUM = {
+    'expected_distance': 13,
+    'expected_path': ['P', 'A', 'B', 'C', 'E', 'F', 'Q'],
+}
+
+EXPECTED_GRAPH_BIG = {
+    'expected_distance': 16,
+    'expected_path': ['P', 'B', 'E', 'H', 'K', 'M', 'Q'],
 }
