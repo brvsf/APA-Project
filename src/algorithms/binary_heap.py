@@ -1,55 +1,55 @@
+import heapq
 from graphs import GRAPH_SMALL, GRAPH_MEDIUM, GRAPH_BIG
 from graphs import EXPECTED_GRAPH_SMALL, EXPECTED_GRAPH_MEDIUM, EXPECTED_GRAPH_BIG
 
-
-def dijkstra(graph, start, end):
+def dijkstra_binary_heap(graph, start):
     """
-    graph: dict de adjacências {nó: [(vizinho, peso), ...]}
-    start: nó inicial (P)
-    end: nó destino (Q)
-    """
-    A = set()
-    B = set()
-    C = set(graph.keys())
+    Implementação clássica de Dijkstra usando binary heap (CLRS style)
 
-    dist = {node: float('inf') for node in graph}
+    graph: dict {u: [(v, weight), ...]}
+    start: nó fonte s
+    """
+
+    dist = {v: float('inf') for v in graph}
+    prev = {v: None for v in graph}
     dist[start] = 0
-    prev = {node: None for node in graph}
 
-    A.add(start)
-    C.remove(start)
-    for neighbor, weight in graph[start]:
-        if neighbor in C:
-            dist[neighbor] = weight
-            prev[neighbor] = start
-            B.add(neighbor)
-            C.remove(neighbor)
+    heap = [(0, start)]
 
-    while end not in A:
-        current = min(B, key=lambda x: dist[x])
-        B.remove(current)
-        A.add(current)
-        for neighbor, weight in graph[current]:
-            if neighbor in C:
-                B.add(neighbor)
-                C.remove(neighbor)
-                dist[neighbor] = dist[current] + weight
-                prev[neighbor] = current
-            elif neighbor in B:
-                if dist[current] + weight < dist[neighbor]:
-                    dist[neighbor] = dist[current] + weight
-                    prev[neighbor] = current
+    visited = set()
+
+    while heap:
+        current_dist, u = heapq.heappop(heap)
+
+        if u in visited:
+            continue
+
+        visited.add(u)
+
+        for v, weight in graph[u]:
+            if dist[v] > current_dist + weight:
+                dist[v] = current_dist + weight
+                prev[v] = u
+                heapq.heappush(heap, (dist[v], v))
+
+    return dist, prev
+
+def reconstruct_path(prev, start, end):
     path = []
-    node = end
-    while node is not None:
-        path.append(node)
-        node = prev[node]
+    v = end
+    while v is not None:
+        path.append(v)
+        v = prev[v]
     path.reverse()
 
-    return dist[end], path
+    if path[0] == start:
+        return path
+    return None
 
-def test_dijkstra(graph, graph_name, expected_result):
-    distance, path = dijkstra(graph, 'P', 'Q')
+def test_dijkstra_binary_heap(graph, graph_name, expected_result):
+    dist, prev = dijkstra_binary_heap(graph, 'P')
+    path = reconstruct_path(prev, 'P', 'Q')
+    distance = dist['Q']
 
     if not isinstance(expected_result, dict):
         return False
@@ -67,16 +67,18 @@ def test_dijkstra(graph, graph_name, expected_result):
         current = path[i]
         next_node = path[i + 1]
         edge_found = False
+
         for neighbor, weight in graph[current]:
             if neighbor == next_node:
                 path_distance += weight
                 edge_found = True
                 break
+
         if not edge_found:
             path_valid = False
             break
 
-    print(f"\nTesting {graph_name}")
+    print(f"\nTesting {graph_name} (Binary Heap)")
     print(f"Found: distance={distance}, path={' → '.join(path)}")
     print(f"Expected: distance={expected_distance}, path={' → '.join(expected_path)}")
 
@@ -85,30 +87,37 @@ def test_dijkstra(graph, graph_name, expected_result):
     consistency_match = abs(distance - path_distance) < 0.0001
 
     if distance_match and path_exact_match and path_valid and consistency_match:
-        print(f"Values match")
+        print("Values match")
         return True
     else:
-        print(f"TEST FAILED")
+        print("TEST FAILED")
         if not distance_match:
             print(f"Distance mismatch: expected {expected_distance}, got {distance}")
         if not path_valid:
-            print(f"Invalid path")
+            print("Invalid path")
         if not consistency_match:
             print(f"Internal inconsistency: calculated {distance} ≠ verified {path_distance}")
         return False
 
+
 def run_all_tests():
-    print("DIJKSTRA ALGORITHM TESTS WITH EXPECTED RESULTS")
+    print("DIJKSTRA BINARY HEAP TESTS WITH EXPECTED RESULTS")
 
     results = []
 
-    test1_passed = test_dijkstra(GRAPH_SMALL, "GRAPH_SMALL", EXPECTED_GRAPH_SMALL)
+    test1_passed = test_dijkstra_binary_heap(
+        GRAPH_SMALL, "GRAPH_SMALL", EXPECTED_GRAPH_SMALL
+    )
     results.append(("GRAPH_SMALL", test1_passed))
 
-    test2_passed = test_dijkstra(GRAPH_MEDIUM, "GRAPH_MEDIUM", EXPECTED_GRAPH_MEDIUM)
+    test2_passed = test_dijkstra_binary_heap(
+        GRAPH_MEDIUM, "GRAPH_MEDIUM", EXPECTED_GRAPH_MEDIUM
+    )
     results.append(("GRAPH_MEDIUM", test2_passed))
 
-    test3_passed = test_dijkstra(GRAPH_BIG, "GRAPH_BIG", EXPECTED_GRAPH_BIG)
+    test3_passed = test_dijkstra_binary_heap(
+        GRAPH_BIG, "GRAPH_BIG", EXPECTED_GRAPH_BIG
+    )
     results.append(("GRAPH_BIG", test3_passed))
 
     passed_count = sum(1 for _, passed in results if passed)
@@ -120,7 +129,6 @@ def run_all_tests():
         print(f"\n{total_count - passed_count} test(s) failed")
 
     return passed_count == total_count
-
 
 if __name__ == "__main__":
     try:
