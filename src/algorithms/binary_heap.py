@@ -1,6 +1,16 @@
 import heapq
-from graphs import GRAPH_SMALL, GRAPH_MEDIUM, GRAPH_BIG
-from graphs import EXPECTED_GRAPH_SMALL, EXPECTED_GRAPH_MEDIUM, EXPECTED_GRAPH_BIG
+
+try:
+    from .graphs import (
+        GRAPH_SMALL, GRAPH_MEDIUM, GRAPH_BIG,
+        EXPECTED_GRAPH_SMALL, EXPECTED_GRAPH_MEDIUM, EXPECTED_GRAPH_BIG
+    )
+except ImportError:
+    from graphs import (
+        GRAPH_SMALL, GRAPH_MEDIUM, GRAPH_BIG,
+        EXPECTED_GRAPH_SMALL, EXPECTED_GRAPH_MEDIUM, EXPECTED_GRAPH_BIG
+    )
+
 
 def dijkstra_binary_heap(graph, start):
     """
