@@ -11,13 +11,11 @@ except ImportError:
         EXPECTED_GRAPH_SMALL, EXPECTED_GRAPH_MEDIUM, EXPECTED_GRAPH_BIG
     )
 
-
-def dijkstra_binary_heap(graph, start):
+def dijkstra_binary_heap(graph, start, end):
     """
-    Implementação clássica de Dijkstra usando binary heap (CLRS style)
-
-    graph: dict {u: [(v, weight), ...]}
-    start: nó fonte s
+    graph: dict de adjacências {nó: [(vizinho, peso), ...]}
+    start: nó inicial (P)
+    end: nó destino (Q)
     """
 
     dist = {v: float('inf') for v in graph}
@@ -25,7 +23,6 @@ def dijkstra_binary_heap(graph, start):
     dist[start] = 0
 
     heap = [(0, start)]
-
     visited = set()
 
     while heap:
@@ -35,31 +32,26 @@ def dijkstra_binary_heap(graph, start):
             continue
 
         visited.add(u)
+        if u == end:
+            break
 
         for v, weight in graph[u]:
-            if dist[v] > current_dist + weight:
+            if v not in visited and dist[v] > current_dist + weight:
                 dist[v] = current_dist + weight
                 prev[v] = u
                 heapq.heappush(heap, (dist[v], v))
 
-    return dist, prev
-
-def reconstruct_path(prev, start, end):
     path = []
-    v = end
-    while v is not None:
-        path.append(v)
-        v = prev[v]
+    node = end
+    while node is not None:
+        path.append(node)
+        node = prev[node]
     path.reverse()
 
-    if path[0] == start:
-        return path
-    return None
+    return dist[end], path
 
 def test_dijkstra_binary_heap(graph, graph_name, expected_result):
-    dist, prev = dijkstra_binary_heap(graph, 'P')
-    path = reconstruct_path(prev, 'P', 'Q')
-    distance = dist['Q']
+    distance, path = dijkstra_binary_heap(graph, 'P', 'Q')
 
     if not isinstance(expected_result, dict):
         return False
@@ -108,7 +100,6 @@ def test_dijkstra_binary_heap(graph, graph_name, expected_result):
         if not consistency_match:
             print(f"Internal inconsistency: calculated {distance} ≠ verified {path_distance}")
         return False
-
 
 def run_all_tests():
     print("DIJKSTRA BINARY HEAP TESTS WITH EXPECTED RESULTS")
