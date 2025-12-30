@@ -1,6 +1,6 @@
 import time
 from algorithms.dijkstra import dijkstra
-from algorithms.binary_heap import dijkstra_binary_heap, reconstruct_path
+from algorithms.binary_heap import dijkstra_binary_heap
 from algorithms.graphs import GRAPH_SMALL, GRAPH_MEDIUM, GRAPH_BIG
 
 def main():
@@ -18,10 +18,32 @@ def main():
     print(f"Dijkstra with medium graph time: {time_sub_dijk_med}")
 
     time_start = time.time()
-    dijk_res_big_dist, dijk_res_big_path = dijkstra(GRAPH_MEDIUM, 'P', 'Q')
+    dijk_res_big_dist, dijk_res_big_path = dijkstra(GRAPH_BIG, 'P', 'Q')
     time_end = time.time()
     time_sub_dijk_big = time_end - time_start
     print(f"Dijkstra with big graph time: {time_sub_dijk_big}")
+    print("="*20)
+
+    print()
+
+    print("===== BINARY HEAP =====")
+    time_start = time.time()
+    dijk_res_small_dist, dijk_res_small_path = dijkstra_binary_heap(GRAPH_SMALL, 'P', 'Q')
+    time_end = time.time()
+    time_sub_dijk_small = time_end - time_start
+    print(f"Binary heap with small graph time: {time_sub_dijk_small}")
+
+    time_start = time.time()
+    dijk_res_med_dist, dijk_res_med_path = dijkstra_binary_heap(GRAPH_MEDIUM, 'P', 'Q')
+    time_end = time.time()
+    time_sub_dijk_med = time_end - time_start
+    print(f"Binary heap with medium graph time: {time_sub_dijk_med}")
+
+    time_start = time.time()
+    dijk_res_big_dist, dijk_res_big_path = dijkstra_binary_heap(GRAPH_BIG, 'P', 'Q')
+    time_end = time.time()
+    time_sub_dijk_big = time_end - time_start
+    print(f"Binary heap with big graph time: {time_sub_dijk_big}")
     print("="*20)
 
 
