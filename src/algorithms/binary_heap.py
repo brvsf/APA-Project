@@ -11,13 +11,16 @@ except ImportError:
         EXPECTED_GRAPH_SMALL, EXPECTED_GRAPH_MEDIUM, EXPECTED_GRAPH_BIG
     )
 
-def dijkstra_binary_heap(graph, start, end):
+def dijkstra_binary_heap(graph, start):
     """
-    graph: dict de adjacências {nó: [(vizinho, peso), ...]}
-    start: nó inicial (P)
-    end: nó destino (Q)
-    """
+    Complete SSSP with binary heap.
+    graph: adjacency dictionary {node: [(neighbor, weight), ...]}
+    start: starting node (e.g., 'P')
 
+    Returns:
+      dist: dict {node: shortest distance from start}
+      prev: dict {node: predecessor on the shortest path}
+    """
     dist = {v: float('inf') for v in graph}
     prev = {v: None for v in graph}
     dist[start] = 0
@@ -27,19 +30,31 @@ def dijkstra_binary_heap(graph, start, end):
 
     while heap:
         current_dist, u = heapq.heappop(heap)
-
         if u in visited:
             continue
 
         visited.add(u)
-        if u == end:
-            break
-
         for v, weight in graph[u]:
-            if v not in visited and dist[v] > current_dist + weight:
-                dist[v] = current_dist + weight
+            if v in visited:
+                continue
+            new_dist = current_dist + weight
+            if new_dist < dist[v]:
+                dist[v] = new_dist
                 prev[v] = u
-                heapq.heappush(heap, (dist[v], v))
+                heapq.heappush(heap, (new_dist, v))
+
+    return dist, prev
+
+
+def build_path(prev, start, end):
+    """
+    Reconstructs the path from start to end using the prev dictionary.
+    Returns a list of nodes or None if end is unreachable.
+    """
+    if start == end:
+        return [start]
+    if end not in prev or prev[end] is None:
+        return None
 
     path = []
     node = end
@@ -48,10 +63,11 @@ def dijkstra_binary_heap(graph, start, end):
         node = prev[node]
     path.reverse()
 
-    return dist[end], path
+    return path if path and path[0] == start else None
+
 
 def test_dijkstra_binary_heap(graph, graph_name, expected_result):
-    distance, path = dijkstra_binary_heap(graph, 'P', 'Q')
+    dist, prev = dijkstra_binary_heap(graph, 'P')
 
     if not isinstance(expected_result, dict):
         return False
@@ -62,31 +78,40 @@ def test_dijkstra_binary_heap(graph, graph_name, expected_result):
     if expected_distance is None or expected_path is None:
         return False
 
-    path_distance = 0
+    end = expected_path[-1]
+    distance = dist.get(end, float('inf'))
+    path = build_path(prev, 'P', end)
+
     path_valid = True
+    path_distance = 0
 
-    for i in range(len(path) - 1):
-        current = path[i]
-        next_node = path[i + 1]
-        edge_found = False
+    if path is None:
+        path_valid = False
+    else:
+        for i in range(len(path) - 1):
+            current = path[i]
+            next_node = path[i + 1]
+            edge_found = False
 
-        for neighbor, weight in graph[current]:
-            if neighbor == next_node:
-                path_distance += weight
-                edge_found = True
+            for neighbor, weight in graph[current]:
+                if neighbor == next_node:
+                    path_distance += weight
+                    edge_found = True
+                    break
+
+            if not edge_found:
+                path_valid = False
                 break
 
-        if not edge_found:
-            path_valid = False
-            break
+    found_path_str = "∅" if path is None else " → ".join(path)
 
-    print(f"\nTesting {graph_name} (Binary Heap)")
-    print(f"Found: distance={distance}, path={' → '.join(path)}")
+    print(f"\nTesting {graph_name} (Binary Heap / SSSP)")
+    print(f"Found: distance={distance}, path={found_path_str}")
     print(f"Expected: distance={expected_distance}, path={' → '.join(expected_path)}")
 
     distance_match = abs(distance - expected_distance) < 0.0001
-    path_exact_match = path == expected_path
-    consistency_match = abs(distance - path_distance) < 0.0001
+    path_exact_match = (path == expected_path)
+    consistency_match = (path is not None) and (abs(distance - path_distance) < 0.0001)
 
     if distance_match and path_exact_match and path_valid and consistency_match:
         print("Values match")
@@ -95,14 +120,17 @@ def test_dijkstra_binary_heap(graph, graph_name, expected_result):
         print("TEST FAILED")
         if not distance_match:
             print(f"Distance mismatch: expected {expected_distance}, got {distance}")
+        if not path_exact_match:
+            print(f"Path mismatch: expected {' → '.join(expected_path)}, got {found_path_str}")
         if not path_valid:
-            print("Invalid path")
-        if not consistency_match:
+            print("Invalid or unreachable path")
+        if path is not None and not consistency_match:
             print(f"Internal inconsistency: calculated {distance} ≠ verified {path_distance}")
         return False
 
+
 def run_all_tests():
-    print("DIJKSTRA BINARY HEAP TESTS WITH EXPECTED RESULTS")
+    print("DIJKSTRA BINARY HEAP TESTS WITH EXPECTED RESULTS (SSSP)")
 
     results = []
 
@@ -130,6 +158,7 @@ def run_all_tests():
         print(f"\n{total_count - passed_count} test(s) failed")
 
     return passed_count == total_count
+
 
 if __name__ == "__main__":
     try:

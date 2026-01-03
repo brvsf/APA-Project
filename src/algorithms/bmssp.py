@@ -1,0 +1,10 @@
+try:
+    from .graphs import (
+        GRAPH_SMALL, GRAPH_MEDIUM, GRAPH_BIG,
+        EXPECTED_GRAPH_SMALL, EXPECTED_GRAPH_MEDIUM, EXPECTED_GRAPH_BIG
+    )
+except ImportError:
+    from graphs import (
+        GRAPH_SMALL, GRAPH_MEDIUM, GRAPH_BIG,
+        EXPECTED_GRAPH_SMALL, EXPECTED_GRAPH_MEDIUM, EXPECTED_GRAPH_BIG
+    )
