@@ -9,7 +9,6 @@ except ImportError:
         EXPECTED_GRAPH_SMALL, EXPECTED_GRAPH_MEDIUM, EXPECTED_GRAPH_BIG
     )
 
-
 def dijkstra(graph, start):
     """
     Complete SSSP
@@ -57,7 +56,6 @@ def dijkstra(graph, start):
 
     return dist, prev
 
-
 def build_path(prev, start, end):
     """
     Reconstructs the path from start to end using the prev dictionary.
@@ -76,7 +74,6 @@ def build_path(prev, start, end):
     path.reverse()
 
     return path if path and path[0] == start else None
-
 
 def test_dijkstra(graph, graph_name, expected_result):
     dist, prev = dijkstra(graph, 'P')
@@ -140,7 +137,6 @@ def test_dijkstra(graph, graph_name, expected_result):
             print(f"Internal inconsistency: calculated {distance} ≠ verified {path_distance}")
         return False
 
-
 def run_all_tests():
     print("DIJKSTRA ALGORITHM TESTS WITH EXPECTED RESULTS (SSSP)")
 
@@ -164,7 +160,6 @@ def run_all_tests():
         print(f"\n{total_count - passed_count} test(s) failed")
 
     return passed_count == total_count
-
 
 if __name__ == "__main__":
     try:

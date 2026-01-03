@@ -65,7 +65,6 @@ def build_path(prev, start, end):
 
     return path if path and path[0] == start else None
 
-
 def test_dijkstra_binary_heap(graph, graph_name, expected_result):
     dist, prev = dijkstra_binary_heap(graph, 'P')
 
@@ -128,7 +127,6 @@ def test_dijkstra_binary_heap(graph, graph_name, expected_result):
             print(f"Internal inconsistency: calculated {distance} ≠ verified {path_distance}")
         return False
 
-
 def run_all_tests():
     print("DIJKSTRA BINARY HEAP TESTS WITH EXPECTED RESULTS (SSSP)")
 
@@ -158,7 +156,6 @@ def run_all_tests():
         print(f"\n{total_count - passed_count} test(s) failed")
 
     return passed_count == total_count
-
 
 if __name__ == "__main__":
     try:
