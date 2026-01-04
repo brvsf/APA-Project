@@ -52,7 +52,7 @@ def main():
     WARMUP = 1
     OUT_DEGREE = 4
 
-    N_LIST = list(range(1_000, 40_001, 1_000))
+    N_LIST = list(range(1_000, 25_001, 1_000))
 
     out_path = "results.csv"
 
